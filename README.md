@@ -1,3 +1,3 @@
-# icefloe
+# Icefloe
 
-A new Flutter project.
+A client side Nostr relay
