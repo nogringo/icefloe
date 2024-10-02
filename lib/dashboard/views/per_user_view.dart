@@ -11,7 +11,7 @@ class PerUserView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Get.theme.colorScheme.primaryContainer,
+        color: Get.theme.colorScheme.primaryContainer.withOpacity(0.2),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -21,7 +21,7 @@ class PerUserView extends StatelessWidget {
           GetBuilder<Repository>(builder: (c) {
             return ListTile(
               title: Text(
-                "${c.chartMode ? "Characters" : "Events"} per users",
+                "${!c.chartMode ? "Bytes" : "Events"} per users",
                 style: Get.textTheme.titleLarge,
               ),
               trailing: Switch(

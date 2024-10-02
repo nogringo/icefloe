@@ -10,7 +10,7 @@ class LogsView extends StatelessWidget {
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: Get.theme.colorScheme.primaryContainer,
+        color: Get.theme.colorScheme.primaryContainer.withOpacity(0.2),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -21,6 +21,11 @@ class LogsView extends StatelessWidget {
             title: Text(
               "Logs",
               style: Get.textTheme.titleLarge,
+            ),
+            trailing: FilledButton.icon(
+              onPressed: Repository.to.startSyncTask,
+              icon: const Icon(Icons.sync),
+              label: const Text("Sync now"),
             ),
           ),
           Expanded(

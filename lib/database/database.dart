@@ -74,7 +74,7 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
-  Future<void> addRelay(String url, {String? alias}) async {
+  Future<void> addRelay(String url, [String? alias]) async {
     into(nostrRelay).insert(
       NostrRelayCompanion(
         url: Value(url),
@@ -94,12 +94,49 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
+  Future<void> joinEventToRelay(String eventId, String relayUrl) async {
+    await into(relayEventLinks).insert(
+      RelayEventLinksCompanion(
+        eventId: Value(eventId),
+        relayUrl: Value(relayUrl),
+      ),
+      mode: InsertMode.insertOrReplace,
+    );
+  }
+
+  Future<void> addEvent({
+    required String id,
+    required String pubkey,
+    required DateTime createdAt,
+    required int kind,
+    required String tags,
+    required String content,
+    required String sig,
+  }) async {
+    await into(nostrEvent).insert(
+      NostrEventCompanion(
+        id: Value(id),
+        pubkey: Value(pubkey),
+        createdAt: Value(createdAt),
+        kind: Value(kind),
+        tags: Value(tags),
+        content: Value(content),
+        sig: Value(sig),
+      ),
+      mode: InsertMode.insertOrReplace,
+    );
+  }
+
   Future<void> removeRelay(String url) async {
     await (delete(nostrRelay)..where((relay) => relay.url.equals(url))).go();
   }
 
   Future<void> removeUser(String pubkey) async {
     await (delete(nostrUser)..where((user) => user.pubkey.equals(pubkey))).go();
+  }
+
+  Future<List<NostrRelayData>> getAllRelays() async {
+    return select(nostrRelay).get();
   }
 
   Future<List<NostrUserData>> getAllUsers() async {
@@ -157,6 +194,36 @@ class AppDatabase extends _$AppDatabase {
           .toList();
     });
   }
+
+  Future<List<EventWithRelays>> getEventsAndRelaysToSend() async {
+    // Get all relays from the database
+    final allRelays = await select(nostrRelay).map((row) => row.url).get();
+
+    // Get all events from the database
+    final allEvents = await select(nostrEvent).get();
+
+    // Create a map to store each event with relays that don't have it
+    final List<EventWithRelays> result = [];
+
+    for (var event in allEvents) {
+      // For each event, check which relays are missing the event
+      final linkedRelaysQuery = select(relayEventLinks)
+        ..where((link) => link.eventId.equals(event.id));
+      final linkedRelays =
+          await linkedRelaysQuery.map((row) => row.relayUrl).get();
+
+      // Find the relays that don't have this event
+      final missingRelays =
+          allRelays.where((relay) => !linkedRelays.contains(relay)).toList();
+
+      // Add the event and its missing relays to the result list
+      if (missingRelays.isNotEmpty) {
+        result.add(EventWithRelays(event: event, missingRelays: missingRelays));
+      }
+    }
+
+    return result;
+  }
 }
 
 class EventsPerUser {
@@ -164,4 +231,11 @@ class EventsPerUser {
   List<NostrEventData> events;
 
   EventsPerUser({required this.user, required this.events});
+}
+
+class EventWithRelays {
+  NostrEventData event;
+  List<String> missingRelays;
+
+  EventWithRelays({required this.event, required this.missingRelays});
 }

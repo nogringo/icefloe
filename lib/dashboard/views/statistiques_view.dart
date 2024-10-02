@@ -6,7 +6,7 @@ class StatistiquesView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return const SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
@@ -88,7 +88,7 @@ class CharacterChip extends StatelessWidget {
             count = events.map((e) => e.content.length).reduce((a, b) => a + b);
           }
           return Text(
-            "$count Character${count < 2 ? "" : "s"}",
+            "$count Byte${count < 2 ? "" : "s"}",
           );
         },
       ),

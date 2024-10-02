@@ -16,7 +16,7 @@ class RelaysView extends StatelessWidget {
       child: Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: Get.theme.colorScheme.primaryContainer,
+          color: Get.theme.colorScheme.primaryContainer.withOpacity(0.2),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -39,14 +39,16 @@ class RelaysView extends StatelessWidget {
                   if (snapshot.data == null) {
                     return const SizedBox();
                   }
-                    
+
                   final relays = snapshot.data!;
                   return ListView(
                     shrinkWrap: true,
                     children: relays
                         .map(
                           (relay) => ListTile(
-                            title: Text(relay.alias ?? relay.url),
+                            title: SelectableText(relay.alias ?? relay.url),
+                            subtitle:
+                                relay.alias == null ? null : SelectableText(relay.url),
                             trailing: IconButton(
                               onPressed: () {
                                 Get.dialog(RemoveRelayPopup(relay));

@@ -16,7 +16,7 @@ class UsersView extends StatelessWidget {
       child: Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: Get.theme.colorScheme.primaryContainer,
+          color: Get.theme.colorScheme.primaryContainer.withOpacity(0.2),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -39,13 +39,16 @@ class UsersView extends StatelessWidget {
                   if (snapshot.data == null) {
                     return const SizedBox();
                   }
-                    
+
                   final users = snapshot.data!;
                   return ListView(
                     children: users
                         .map(
                           (user) => ListTile(
-                            title: Text(user.alias ?? user.pubkey),
+                            title: SelectableText(user.alias ?? user.pubkey),
+                            subtitle: user.alias == null
+                                ? null
+                                : SelectableText(user.pubkey),
                             trailing: IconButton(
                               onPressed: () {
                                 Get.dialog(RemoveUserPopup(user));

@@ -48,7 +48,8 @@ class AddRelayPopup extends StatelessWidget {
               alias = aliasInput;
             }
 
-            AppDatabase.to.addRelay(urlController.text, alias: alias);
+            final url = urlController.text;
+            AppDatabase.to.addRelay(url, alias);
 
             Get.back();
           },

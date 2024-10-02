@@ -10,6 +10,9 @@ class DashboardPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        if (constraints.maxHeight < 250) {
+          return const SizedBox();
+        }
         if (constraints.maxWidth > 425 * 2.2) {
           return const DashboardLargeLayout();
         }
