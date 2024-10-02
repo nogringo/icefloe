@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:icefloe/repository.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 Future<String> nostrSendEvent(String event, String url) async {
@@ -11,6 +12,8 @@ Future<String> nostrSendEvent(String event, String url) async {
   await channel.ready;
 
   channel.stream.listen((eventPayload) {
+    Repository.to.addLog(eventPayload);
+    
     completer.complete(eventPayload);
     channel.sink.close();
   });
@@ -29,6 +32,8 @@ Future<List<String>> nostrFetchEvents(String request, String url) async {
 
   List<String> results = [];
   channel.stream.listen((eventPayload) {
+    Repository.to.addLog(eventPayload);
+
     final jsonObj = jsonDecode(eventPayload);
     String type = jsonObj[0];
     if (type == 'EVENT') {
